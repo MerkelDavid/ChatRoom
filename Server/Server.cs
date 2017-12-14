@@ -13,29 +13,56 @@ namespace Server
     class Server
     {
         public static Client client;
+        Dictionary<int,Client> Clients;
         TcpListener server;
         public Server()
         {
+            Clients = new Dictionary<int, Client>();
             server = new TcpListener(IPAddress.Parse("127.0.0.1"), 9999);
             server.Start();
         }
-        public void Run()
+        public void  Run()
         {
-            AcceptClient();
-            string message = client.Recieve();
-            Respond(message);
+            AcceptClients();
         }
-        private void AcceptClient()
+
+        public async void ManageMessages()
         {
-            TcpClient clientSocket = default(TcpClient);
-            clientSocket = server.AcceptTcpClient();
-            Console.WriteLine("Connected");
-            NetworkStream stream = clientSocket.GetStream();
-            client = new Client(stream, clientSocket);
+            while (true)
+            {
+                Task<string> message = client.Recieve();
+                await message;
+                Respond(message.Result);
+            }
+        }
+
+        private void AcceptClients()
+        {
+            while (true)
+            {
+                TcpClient clientSocket = default(TcpClient);
+                clientSocket = server.AcceptTcpClient();
+                Console.WriteLine("Connected");
+                NetworkStream stream = clientSocket.GetStream();
+                client = new Client(stream, clientSocket);
+                Clients.Add(Clients.Count, client);
+                Thread newThread = new Thread(ManageMessages);
+                newThread.Start();
+            }
+
         }
         private void Respond(string body)
         {
-             client.Send(body);
+            Object thislock = new Object();
+            lock(thislock){
+                foreach (KeyValuePair<int, Client> item in Clients)
+                {
+                    //if (client != item.Value)
+                        item.Value.Send(body);
+                }
+            }
         }
+
+
     }
 }

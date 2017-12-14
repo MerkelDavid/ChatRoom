@@ -23,12 +23,31 @@ namespace Client
             string messageString = UI.GetInput();
             byte[] message = Encoding.ASCII.GetBytes(messageString);
             stream.Write(message, 0, message.Count());
+            Send();
         }
         public void Recieve()
         {
             byte[] recievedMessage = new byte[256];
             stream.Read(recievedMessage, 0, recievedMessage.Length);
-            UI.DisplayMessage(Encoding.ASCII.GetString(recievedMessage));
+            if (recievedMessage.Length > 0)
+            {
+                UI.DisplayMessage(Encoding.ASCII.GetString(recievedMessage));
+                Recieve();
+            }
+            else
+            {
+                Recieve();
+            }
+        }
+
+        public Task chat()
+        {
+                Parallel.Invoke(
+                    () => Send(),
+                    () => Recieve()
+                );
+
+            return null;
         }
     }
 }

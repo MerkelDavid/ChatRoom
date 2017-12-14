@@ -9,21 +9,23 @@ namespace Server
 {
     class Client
     {
-        NetworkStream stream;
-        TcpClient client;
-        public string UserId;
+        public NetworkStream stream;
+        public TcpClient client;
+        public string UserName;
         public Client(NetworkStream Stream, TcpClient Client)
         {
             stream = Stream;
             client = Client;
-            UserId = "495933b6-1762-47a1-b655-483510072e73";
+            UserName ="asdfasdfasd";
         }
+
         public void Send(string Message)
         {
+
             byte[] message = Encoding.ASCII.GetBytes(Message);
             stream.Write(message, 0, message.Count());
         }
-        public string Recieve()
+        public async Task<string> Recieve()
         {
             byte[] recievedMessage = new byte[256];
             stream.Read(recievedMessage, 0, recievedMessage.Length);
@@ -31,6 +33,5 @@ namespace Server
             Console.WriteLine(recievedMessageString);
             return recievedMessageString;
         }
-
     }
 }
