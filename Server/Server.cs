@@ -15,8 +15,12 @@ namespace Server
         public static Client client;
         Dictionary<int,Client> Clients;
         TcpListener server;
+        Queue<string> Messages;
+
+
         public Server()
         {
+            Messages = new Queue<string>();
             Clients = new Dictionary<int, Client>();
             server = new TcpListener(IPAddress.Parse("127.0.0.1"), 9999);
             server.Start();
@@ -31,8 +35,10 @@ namespace Server
             while (true)
             {
                 Task<string> message = client.Recieve();
+                Messages.Enqueue(message.Result);
                 await message;
-                Respond(message.Result);
+                string actualMessage = client.UserName +": "+ message.Result;
+                Respond(actualMessage);
             }
         }
 
@@ -46,6 +52,7 @@ namespace Server
                 NetworkStream stream = clientSocket.GetStream();
                 client = new Client(stream, clientSocket);
                 Clients.Add(Clients.Count, client);
+                Respond(client.UserName + "has connected");
                 Thread newThread = new Thread(ManageMessages);
                 newThread.Start();
             }

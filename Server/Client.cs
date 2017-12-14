@@ -16,7 +16,12 @@ namespace Server
         {
             stream = Stream;
             client = Client;
-            UserName ="asdfasdfasd";
+            UserName = "User"+generateID();
+        }
+
+        public string generateID()
+        {
+            return Guid.NewGuid().ToString("N");
         }
 
         public void Send(string Message)
