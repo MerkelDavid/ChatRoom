@@ -15,12 +15,11 @@ namespace Server
         public static Client client;
         Dictionary<int,Client> Clients;
         TcpListener server;
-        Queue<string> Messages;
+        Log messageLog = new Log();
 
 
         public Server()
         {
-            Messages = new Queue<string>();
             Clients = new Dictionary<int, Client>();
             server = new TcpListener(IPAddress.Parse("127.0.0.1"), 9999);
             server.Start();
@@ -72,7 +71,7 @@ namespace Server
         private void Respond(string body,Client currentClient)
         {
             Object thislock = new Object();
-            Messages.Enqueue(body);
+            messageLog.AddToLog(currentClient,body);
             lock(thislock){
                 foreach (KeyValuePair<int, Client> item in Clients)
                 {
