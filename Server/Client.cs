@@ -29,6 +29,7 @@ namespace Server
 
             byte[] message = Encoding.ASCII.GetBytes(Message);
             stream.Write(message, 0, message.Count());
+
         }
         public async Task<string> Recieve()
         {

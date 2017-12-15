@@ -18,10 +18,11 @@ namespace Client
             clientSocket.Connect(IPAddress.Parse(IP), port);
             stream = clientSocket.GetStream();
         }
-        public void Send()
+        public async void Send()
         {
-            string messageString = UI.GetInput();
-            byte[] message = Encoding.ASCII.GetBytes(messageString);
+            Task <string> messageString = Task.Run(()=>UI.GetInput());
+            await messageString;
+            byte[] message = Encoding.ASCII.GetBytes(messageString.Result);
             stream.Write(message, 0, message.Count());
             Send();
         }

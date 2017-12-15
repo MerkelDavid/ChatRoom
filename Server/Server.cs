@@ -30,15 +30,25 @@ namespace Server
             AcceptClients();
         }
 
-        public async void ManageMessages()
+        public async void ManageMessages(Client currentClient)
         {
             while (true)
             {
-                Task<string> message = client.Recieve();
-                Messages.Enqueue(message.Result);
-                await message;
-                string actualMessage = client.UserName +": "+ message.Result;
-                Respond(actualMessage);
+                string actualMessage = "";
+                try
+                {
+                        Task<string> message = currentClient.Recieve();
+                        await message;
+                        actualMessage = currentClient.UserName + ": " + message.Result;
+                        Respond(actualMessage,currentClient);
+                }
+                catch(Exception e)
+                {
+                    //user 'logs off'
+                    actualMessage = currentClient.UserName + " has logged off";
+                    Respond(actualMessage,currentClient);
+                }
+
             }
         }
 
@@ -50,22 +60,23 @@ namespace Server
                 clientSocket = server.AcceptTcpClient();
                 Console.WriteLine("Connected");
                 NetworkStream stream = clientSocket.GetStream();
-                client = new Client(stream, clientSocket);
-                Clients.Add(Clients.Count, client);
-                Respond(client.UserName + "has connected");
-                Thread newThread = new Thread(ManageMessages);
+                Client Tempclient = new Client(stream, clientSocket);
+                Clients.Add(Clients.Count, Tempclient);
+                Respond(Tempclient.UserName + "has connected",Tempclient);
+                Thread newThread = new Thread(()=>ManageMessages(Tempclient));
                 newThread.Start();
             }
 
         }
-        private void Respond(string body)
+        private void Respond(string body,Client currentClient)
         {
             Object thislock = new Object();
+            Messages.Enqueue(body);
             lock(thislock){
                 foreach (KeyValuePair<int, Client> item in Clients)
                 {
-                    //if (client != item.Value)
-                        item.Value.Send(body);
+                    if (currentClient != item.Value)
+                    item.Value.Send(body);
                 }
             }
         }
