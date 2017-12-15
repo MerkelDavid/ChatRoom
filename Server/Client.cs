@@ -16,7 +16,22 @@ namespace Server
         {
             stream = Stream;
             client = Client;
-            UserName = "User"+generateID();
+            //UserName = "User"+generateID();
+            UserName = "User " + CreateUserName(stream);//new code : change user name
+        }
+
+        //new method : get user name
+        public string CreateUserName(NetworkStream stream)
+        {
+            string askForName = "Please enter a user name.";
+            byte[] message = Encoding.ASCII.GetBytes(askForName);
+            stream.Write(message, 0, message.Count());
+
+            byte[] recievedMessage = new byte[256];
+            stream.Read(recievedMessage, 0, recievedMessage.Length);
+            string recievedMessageString = Encoding.ASCII.GetString(recievedMessage);
+
+            return recievedMessageString;
         }
 
         public string generateID()
