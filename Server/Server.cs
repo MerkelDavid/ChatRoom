@@ -39,7 +39,7 @@ namespace Server
                 {
                         Task<string> message = currentClient.Recieve();
                         await message;
-                        actualMessage = currentClient.UserName + ": " + message.Result;
+                        actualMessage = currentClient.UserName + message.Result;
                         Respond(actualMessage,currentClient);
                 }
                 catch(Exception e)
@@ -47,6 +47,7 @@ namespace Server
                     //user 'logs off'
                     actualMessage = currentClient.UserName + " has logged off";
                     Respond(actualMessage,currentClient);
+                    break;
                 }
 
             }
