@@ -12,13 +12,13 @@ namespace Server
 
         public Log()
         {
-
+            messageLog = new Queue<Message>();
         }
 
         public void AddToLog(Client messageClient, string currentMessage)
         {
 
-            messageLog.Enqueue(new Message(messageClient,currentMessage));
+            messageLog.Enqueue(new Message(messageClient, currentMessage));
         }
 
         public void printLog()

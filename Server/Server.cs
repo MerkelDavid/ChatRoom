@@ -71,11 +71,12 @@ namespace Server
         private void Respond(string body,Client currentClient)
         {
             Object thislock = new Object();
-            messageLog.AddToLog(currentClient,body);
+            //messageLog.AddToLog(currentClient,body);
             lock(thislock){
                 foreach (KeyValuePair<int, Client> item in Clients)
                 {
                     if (currentClient != item.Value)
+                    messageLog.AddToLog(currentClient, body);//moved here
                     item.Value.Send(body);
                 }
             }
