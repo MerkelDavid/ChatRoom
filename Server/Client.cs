@@ -16,11 +16,9 @@ namespace Server
         {
             stream = Stream;
             client = Client;
-            //UserName = "User"+generateID();
-            UserName = "User " + CreateUserName(stream);//new code : change user name
+            UserName = "User " + CreateUserName(stream);
         }
 
-        //new method : get user name
         public string CreateUserName(NetworkStream stream)
         {
             string askForName = "Please enter a user name.";
@@ -41,9 +39,16 @@ namespace Server
 
         public void Send(string Message)
         {
-
-            byte[] message = Encoding.ASCII.GetBytes(Message);
-            stream.Write(message, 0, message.Count());
+            try
+            {
+                byte[] message = Encoding.ASCII.GetBytes(Message);
+                stream.Write(message, 0, message.Count());
+            }
+            catch
+            {
+                //user 'logs off'
+                Console.WriteLine("Users has signed off.");
+            }
 
         }
         public async Task<string> Recieve()
